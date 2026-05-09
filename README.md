@@ -1,4 +1,4 @@
-![Banner](./banner.png)
+![Banner](./Banner.png)
 
 # 🧘 AI Coaching Assistant (ICF-Style Conversational AI)
 
