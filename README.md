@@ -10,7 +10,7 @@ The application simulates an ICF-style coaching interaction where the assistant 
 
 ## 🎥 Product Demo
 
-[Watch Demo Video](./demo.mp4)
+Demo video available in repository files above.
 
 Recommended:
 
