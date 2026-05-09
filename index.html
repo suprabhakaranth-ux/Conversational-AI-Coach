@@ -4,454 +4,932 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Conversational AI Coach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
+    :root {
+      --bg:       #0d110f;
+      --surface:  #141a17;
+      --raised:   #1b2420;
+      --border:   #263330;
+      --em:       #00c896;
+      --em-dim:   #0a2920;
+      --amber:    #e8b84b;
+      --amber-dim:#2a1f06;
+      --text:     #c9d4ce;
+      --muted:    #5e7a6e;
+      --bright:   #e8f0ec;
     }
 
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
     body {
-      background: #0f172a;
-      color: white;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 15.5px;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px;
+      left: -200px;
+      width: 700px;
+      height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,200,150,0.045) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    * { position: relative; z-index: 1; }
+
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      color: var(--bright);
+    }
+    h1 em { font-style: italic; color: var(--em); }
+
+    h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 600;
+      color: var(--bright);
+      letter-spacing: 0.01em;
+    }
+
+    h3 {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--bright);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    p { color: var(--text); }
+
+    code {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.78rem;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      padding: 1px 7px;
+      border-radius: 3px;
+      color: var(--em);
+    }
+
+    .wrap { max-width: 980px; margin: auto; padding: 0 28px; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+    }
+    .topbar-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .topbar-logo {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+    .topbar-links { display: flex; gap: 20px; }
+    .topbar-links a {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: color 0.2s;
+    }
+    .topbar-links a:hover { color: var(--em); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 80px 0 70px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-kicker {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--em);
+      margin-bottom: 22px;
+    }
+
+    .hero-desc {
+      margin-top: 22px;
+      max-width: 560px;
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 300;
       line-height: 1.7;
     }
 
-    .hero {
-      padding: 100px 20px;
-      text-align: center;
-      background: linear-gradient(135deg, #111827, #1e293b);
-    }
-
-    .hero h1 {
-      font-size: 3rem;
-      margin-bottom: 20px;
-    }
-
-    .hero p {
-      max-width: 800px;
-      margin: auto;
-      color: #cbd5e1;
-      font-size: 1.1rem;
-    }
-
-    .buttons {
-      margin-top: 35px;
+    .hero-actions {
+      margin-top: 34px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
     .btn {
-      display: inline-block;
-      margin: 10px;
-      padding: 12px 24px;
-      background: #2563eb;
-      color: white;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.76rem;
+      padding: 9px 22px;
+      border-radius: 4px;
       text-decoration: none;
-      border-radius: 8px;
-      transition: 0.3s;
+      transition: all 0.2s;
+      letter-spacing: 0.04em;
     }
+    .btn-solid { background: var(--em); color: #051a12; font-weight: 500; }
+    .btn-solid:hover { background: #00dfa8; }
+    .btn-line { border: 1px solid var(--border); color: var(--muted); }
+    .btn-line:hover { border-color: var(--em); color: var(--em); }
 
-    .btn:hover {
-      background: #1d4ed8;
+    /* ── METRICS ── */
+    .metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      margin-top: 52px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
     }
-
-    section {
-      max-width: 1150px;
-      margin: auto;
-      padding: 80px 20px;
+    .met {
+      flex: 1;
+      min-width: 120px;
+      padding-right: 28px;
+      border-right: 1px solid var(--border);
+      margin-right: 28px;
     }
-
-    h2 {
+    .met:last-child { border-right: none; margin-right: 0; }
+    .met-val {
+      font-family: 'Cormorant Garamond', serif;
       font-size: 2.2rem;
-      margin-bottom: 20px;
+      color: var(--bright);
+      line-height: 1;
+      display: block;
+    }
+    .met-key {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      margin-top: 5px;
     }
 
-    p {
-      color: #cbd5e1;
+    /* ── SECTIONS ── */
+    .section {
+      padding: 72px 0;
+      border-bottom: 1px solid var(--border);
     }
+    .section:last-of-type { border-bottom: none; }
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 22px;
-      margin-top: 35px;
-    }
-
-    .card {
-      background: #1e293b;
-      padding: 28px;
-      border-radius: 14px;
-      border: 1px solid #334155;
-      transition: 0.3s;
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-      border-color: #3b82f6;
-    }
-
-    .card h3 {
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
       margin-bottom: 14px;
-      font-size: 1.1rem;
+    }
+    .section-tag::before {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 1px;
+      background: var(--muted);
     }
 
-    .architecture-card {
-      background: #111827;
+    .section-intro {
+      max-width: 600px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-top: 10px;
+      font-weight: 300;
+    }
+    .section-intro + .section-intro { margin-top: 12px; }
+
+    /* ── FLOW ── */
+    .flow { margin-top: 40px; display: flex; flex-direction: column; }
+
+    .flow-step {
+      display: grid;
+      grid-template-columns: 48px 3px 1fr;
+      gap: 0 18px;
+      align-items: stretch;
     }
 
-    ul {
-      margin-top: 12px;
-      padding-left: 18px;
-      color: #cbd5e1;
+    .flow-index {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      padding-top: 18px;
+      text-align: right;
+      letter-spacing: 0.04em;
     }
 
-    li {
-      margin-bottom: 8px;
+    .flow-line-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .flow-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--em);
+      margin-top: 20px;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(0,200,150,0.4);
+    }
+    .flow-connector {
+      width: 1px;
+      flex: 1;
+      background: var(--border);
+      min-height: 20px;
+    }
+    .flow-step:last-child .flow-connector { display: none; }
+
+    .flow-body { padding: 14px 0 28px; }
+    .flow-title {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--bright);
+      margin-bottom: 3px;
+    }
+    .flow-tech {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.7rem;
+      color: var(--em);
+      margin-bottom: 6px;
+    }
+    .flow-desc { font-size: 0.85rem; color: var(--muted); max-width: 520px; }
+
+    /* ── DEPTH BLOCKS ── */
+    .depth-block {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    .depth-block + .depth-block { margin-top: 12px; }
+
+    .depth-header {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 22px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .depth-layer-label {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+    .depth-title {
+      font-family: 'Source Sans 3', sans-serif;
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--bright);
+    }
+    .depth-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.62rem;
+      padding: 3px 9px;
+      border-radius: 20px;
+      letter-spacing: 0.04em;
+    }
+    .chip-green { background: var(--em-dim); color: var(--em); border: 1px solid rgba(0,200,150,0.2); }
+    .chip-amber { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(232,184,75,0.2); }
+
+    .depth-body { padding: 20px 22px; background: var(--raised); }
+    .depth-body p { font-size: 0.88rem; color: var(--muted); line-height: 1.72; }
+    .depth-body p + p { margin-top: 10px; }
+
+    .insight {
+      margin-top: 14px;
+      padding: 13px 16px;
+      border-left: 2px solid var(--em);
+      background: rgba(0,200,150,0.04);
+    }
+    .insight-label {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--em);
+      margin-bottom: 5px;
+    }
+    .insight p { font-size: 0.84rem; }
+
+    /* ── AXES ── */
+    .axes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 18px;
+    }
+    .axis-cell { background: var(--raised); padding: 16px 18px; }
+    .axis-name {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.65rem;
+      color: var(--em);
+      letter-spacing: 0.06em;
+      margin-bottom: 5px;
+    }
+    .axis-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+    .axis-eg {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.63rem;
+      color: var(--amber);
+      margin-top: 4px;
     }
 
-    .video-box {
-      background: #1e293b;
-      padding: 35px;
-      border-radius: 14px;
-      text-align: center;
-      margin-top: 30px;
+    /* ── TABLE ── */
+    .plain-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 0.83rem;
     }
+    .plain-table th {
+      text-align: left;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 400;
+    }
+    .plain-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: top;
+    }
+    .plain-table tr:last-child td { border-bottom: none; }
+    .plain-table tr:hover td { background: var(--surface); }
+    .plain-table td:first-child { color: var(--bright); font-weight: 600; }
 
+    /* ── ADAPT ITEMS ── */
+    .adapt-list {
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .adapt-item {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .adapt-left {
+      background: var(--raised);
+      padding: 20px 18px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .adapt-verb {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      color: var(--em);
+      font-style: italic;
+      line-height: 1;
+    }
+    .adapt-target {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.62rem;
+      color: var(--muted);
+      margin-top: 4px;
+      letter-spacing: 0.04em;
+    }
+    .adapt-right { padding: 18px 20px; }
+    .adapt-right h3 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--bright);
+      text-transform: none;
+      letter-spacing: 0;
+      margin-bottom: 6px;
+    }
+    .adapt-right p { font-size: 0.83rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── PRIVACY ── */
+    .priv-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin-top: 28px;
+    }
+    .priv-cell {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 18px 20px;
+      background: var(--surface);
+    }
+    .priv-cell h3 {
+      font-size: 0.8rem;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--bright);
+      margin-bottom: 7px;
+    }
+    .priv-cell p { font-size: 0.82rem; color: var(--muted); }
+
+    /* ── TERMINAL ── */
+    pre.terminal {
+      background: #060d0a;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 22px 24px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      line-height: 1.9;
+      color: var(--em);
+      overflow-x: auto;
+      margin-top: 24px;
+    }
+    pre.terminal .cmt { color: var(--muted); }
+    pre.terminal .dim { color: #3a5c4e; }
+
+    /* ── FOOTER ── */
     footer {
-      text-align: center;
-      padding: 40px;
-      border-top: 1px solid #334155;
-      color: #94a3b8;
-      margin-top: 50px;
+      padding: 36px 0;
+      border-top: 1px solid var(--border);
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    footer p {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
     }
 
-    .section-subtitle {
-      color: #94a3b8;
-      margin-bottom: 20px;
-      max-width: 900px;
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .depth-header { grid-template-columns: 1fr; gap: 8px; }
+      .adapt-item { grid-template-columns: 1fr; }
+      .adapt-left { border-right: none; border-bottom: 1px solid var(--border); padding: 14px 18px; }
+      .flow-step { grid-template-columns: 36px 3px 1fr; }
+      .met { min-width: 90px; margin-bottom: 16px; }
     }
-
   </style>
 </head>
-
 <body>
 
-  <section class="hero">
+<nav class="topbar">
+  <div class="wrap topbar-inner">
+    <span class="topbar-logo">ai-coach / docs</span>
+    <div class="topbar-links">
+      <a href="https://github.com" target="_blank">github ↗</a>
+      <a href="demo.mp4" target="_blank">demo ↗</a>
+    </div>
+  </div>
+</nav>
 
-    <h1>🧘 Conversational AI Coach</h1>
 
-    <p>
-      A multilingual voice-enabled conversational AI coaching assistant designed to simulate reflective,
-      ICF-style coaching conversations using speech recognition, conversational memory,
-      prompt engineering, and AI voice interaction.
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-kicker">voice · nlp · prompt engineering</div>
+    <h1>Conversational<br><em>AI Coach</em></h1>
+    <p class="hero-desc">
+      A voice-first coaching assistant that simulates reflective, ICF-style conversations across three languages —
+      built on Whisper, GPT, and OpenAI TTS, deployed on Hugging Face Spaces.
     </p>
-
-    <div class="buttons">
-      <a class="btn" href="https://github.com" target="_blank">View GitHub</a>
-      <a class="btn" href="demo.mp4" target="_blank">Watch Demo</a>
+    <div class="hero-actions">
+      <a class="btn btn-solid" href="https://github.com" target="_blank">View on GitHub</a>
+      <a class="btn btn-line"  href="demo.mp4" target="_blank">▶ Watch Demo</a>
     </div>
 
-  </section>
+    <div class="metrics">
+      <div class="met">
+        <span class="met-val">3</span>
+        <div class="met-key">languages supported</div>
+      </div>
+      <div class="met">
+        <span class="met-val">ICF</span>
+        <div class="met-key">coaching framework</div>
+      </div>
+      <div class="met">
+        <span class="met-val">6</span>
+        <div class="met-key">pipeline layers</div>
+      </div>
+      <div class="met">
+        <span class="met-val">₹0</span>
+        <div class="met-key">monthly running cost</div>
+      </div>
+    </div>
+  </div>
+</div>
 
-  <section>
 
-    <h2>Why This Project</h2>
-
-    <p class="section-subtitle">
-      Most AI assistants are designed to answer questions, provide solutions, or automate tasks.
-      Professional coaching works differently — it focuses on reflection, self-discovery,
-      active listening, and open-ended questioning.
+<div class="section">
+  <div class="wrap">
+    <div class="section-tag">Background</div>
+    <h2>What makes coaching different from Q&amp;A</h2>
+    <p class="section-intro">
+      Most AI assistants are optimised for answers. Professional coaching works the other way —
+      it uses open questions, reflection, and deliberate restraint to surface what the person already knows.
     </p>
-
-    <p class="section-subtitle">
-      This project explores whether conversational AI can simulate a more reflective coaching experience
-      through multilingual voice interaction, conversational continuity, and coaching-oriented prompt engineering.
+    <p class="section-intro">
+      This project explores whether a voice pipeline can replicate that dynamic across languages.
+      The specific gap with Indian language users: the most reflective conversations happen in a
+      first language, and English-only coaching tools miss that entirely.
+      An editable transcript layer ensures ASR errors never corrupt what gets sent to the model.
     </p>
+  </div>
+</div>
 
-  </section>
 
-  <section>
+<div class="section">
+  <div class="wrap">
+    <div class="section-tag">How it works</div>
+    <h2>End-to-end conversation flow</h2>
+    <p class="section-intro">Six stages, each stateless with respect to the next — any layer can be swapped independently.</p>
 
-    <h2>Core Features</h2>
-
-    <div class="cards">
-
-      <div class="card">
-        <h3>🎙️ Voice-Based Coaching</h3>
-        <p>
-          Users can speak naturally through microphone input and receive AI-generated spoken coaching responses.
-        </p>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-index">01</div>
+        <div class="flow-line-col"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+        <div class="flow-body">
+          <div class="flow-title">Speak</div>
+          <div class="flow-tech">Microphone input via Gradio</div>
+          <div class="flow-desc">User speaks in English, Hindi, or Kannada. No language pre-selection needed — detection is handled downstream by Whisper.</div>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>✍️ Editable Transcript Layer</h3>
-        <p>
-          Speech recognition systems may occasionally misinterpret accents or pronunciation.
-          The transcript is shown before submission so users can review and correct it if required.
-        </p>
+      <div class="flow-step">
+        <div class="flow-index">02</div>
+        <div class="flow-line-col"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+        <div class="flow-body">
+          <div class="flow-title">Transcribe</div>
+          <div class="flow-tech">OpenAI Whisper — multilingual ASR</div>
+          <div class="flow-desc">Whisper converts audio to text in a single multilingual inference call. Outputs the detected language alongside the transcript for downstream prompt construction.</div>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>🌍 Multilingual Support</h3>
-        <p>
-          Supports conversational coaching interactions in English, Hindi, and Kannada.
-        </p>
+      <div class="flow-step">
+        <div class="flow-index">03</div>
+        <div class="flow-line-col"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+        <div class="flow-body">
+          <div class="flow-title">Validate transcript</div>
+          <div class="flow-tech">Editable text field — user-controlled submit</div>
+          <div class="flow-desc">The transcript is shown before submission. Nothing reaches GPT until the user confirms. Accent errors, mixed-script confusion, or mispronunciations can be corrected in under two seconds — without breaking the conversation.</div>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>🧠 Conversational Continuity</h3>
-        <p>
-          Maintains session context across multiple coaching turns for a more natural conversational flow.
-        </p>
+      <div class="flow-step">
+        <div class="flow-index">04</div>
+        <div class="flow-line-col"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+        <div class="flow-body">
+          <div class="flow-title">Generate coaching response</div>
+          <div class="flow-tech">OpenAI GPT + ICF persona system prompt + session history</div>
+          <div class="flow-desc">Full session history is passed with every turn so the model can reference earlier statements. The system prompt enforces ICF coaching behaviour: one question at a time, no unsolicited advice, reflect before probing deeper.</div>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>🧭 ICF-Style Coaching Prompts</h3>
-        <p>
-          Designed around reflective coaching principles using active listening,
-          empathy, clarity, and self-discovery-oriented dialogue patterns.
-        </p>
+      <div class="flow-step">
+        <div class="flow-index">05</div>
+        <div class="flow-line-col"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+        <div class="flow-body">
+          <div class="flow-title">Synthesise voice</div>
+          <div class="flow-tech">OpenAI TTS</div>
+          <div class="flow-desc">The coaching response is converted to spoken audio. Voice and pacing are matched to the coaching style configured in the persona prompt.</div>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>👤 Coach Persona Customization</h3>
-        <p>
-          Coaching tone, empathy level, directness, warmth, questioning style,
-          and communication behavior can be customized through prompt engineering.
-        </p>
+      <div class="flow-step">
+        <div class="flow-index">06</div>
+        <div class="flow-line-col"><div class="flow-dot"></div></div>
+        <div class="flow-body">
+          <div class="flow-title">Play response</div>
+          <div class="flow-tech">Gradio audio component + session state</div>
+          <div class="flow-desc">Audio is played back through the same Gradio interface. Session state is maintained across turns for conversational continuity.</div>
+        </div>
       </div>
+    </div>
+  </div>
+</div>
 
+
+<div class="section">
+  <div class="wrap">
+    <div class="section-tag">Technical depth</div>
+    <h2>Layer decisions and rationale</h2>
+    <p class="section-intro">The architectural choices that aren't obvious from the flow diagram.</p>
+
+    <div class="depth-block">
+      <div class="depth-header">
+        <span class="depth-layer-label">Layer 02</span>
+        <span class="depth-title">Why Whisper over other ASR providers</span>
+        <div class="depth-chips">
+          <span class="chip chip-green">OpenAI Whisper</span>
+          <span class="chip chip-amber">Indic language support</span>
+        </div>
+      </div>
+      <div class="depth-body">
+        <p>Other ASR providers were evaluated and failed on Kannada and Hindi code-switching without fine-tuning.
+        Whisper's multilingual model handles all three languages in one inference call with no language detection pre-step.
+        It can also be replaced with a local <code>faster-whisper</code> instance with no interface change if API cost becomes a constraint.</p>
+      </div>
     </div>
 
-  </section>
+    <div class="depth-block">
+      <div class="depth-header">
+        <span class="depth-layer-label">Layer 03</span>
+        <span class="depth-title">Why the transcript isn't auto-submitted</span>
+        <div class="depth-chips">
+          <span class="chip chip-green">User trust</span>
+          <span class="chip chip-amber">ASR error recovery</span>
+        </div>
+      </div>
+      <div class="depth-body">
+        <p>Coaching conversations are personal. A model response to a garbled transcript — replying to something the user
+        never actually said — breaks trust immediately and is hard to recover from mid-session.
+        One deliberate confirmation tap is a worthwhile UX trade-off for that reliability.</p>
+      </div>
+    </div>
 
-  <section>
+    <div class="depth-block">
+      <div class="depth-header">
+        <span class="depth-layer-label">Layer 04</span>
+        <span class="depth-title">ICF behavioural constraints in the system prompt</span>
+        <div class="depth-chips">
+          <span class="chip chip-green">Prompt engineering</span>
+          <span class="chip chip-amber">ICF / GROW / Co-active</span>
+        </div>
+      </div>
+      <div class="depth-body">
+        <p>The system prompt overrides the model's default "helpful assistant" behaviour with hard rules derived from
+        ICF coaching principles — not soft stylistic instructions. Explicit constraints: ask one question per turn,
+        never give unsolicited advice, acknowledge emotion before exploring action, reflect before probing deeper.</p>
+        <div class="insight">
+          <div class="insight-label">Configurable axes</div>
+          <p>Empathy level, directness, warmth, questioning style, and coaching framework are independently
+          adjustable through the prompt — no code changes needed.</p>
+        </div>
+        <div class="axes">
+          <div class="axis-cell">
+            <div class="axis-name">empathy</div>
+            <div class="axis-desc">How much emotion is validated before moving forward</div>
+            <div class="axis-eg">high / moderate / low</div>
+          </div>
+          <div class="axis-cell">
+            <div class="axis-name">directness</div>
+            <div class="axis-desc">Whether the coach reflects or gently challenges</div>
+            <div class="axis-eg">reflective / challenging</div>
+          </div>
+          <div class="axis-cell">
+            <div class="axis-name">warmth</div>
+            <div class="axis-desc">Language register and relational tone</div>
+            <div class="axis-eg">warm / neutral / formal</div>
+          </div>
+          <div class="axis-cell">
+            <div class="axis-name">question style</div>
+            <div class="axis-desc">Coaching question pattern to follow</div>
+            <div class="axis-eg">Socratic / scaling / miracle</div>
+          </div>
+          <div class="axis-cell">
+            <div class="axis-name">framework</div>
+            <div class="axis-desc">Coaching model the prompt is anchored to</div>
+            <div class="axis-eg">ICF / GROW / Co-active</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <h2>Architecture</h2>
+    <div class="depth-block">
+      <div class="depth-header">
+        <span class="depth-layer-label">Layer 06</span>
+        <span class="depth-title">Why Gradio and Hugging Face Spaces</span>
+        <div class="depth-chips">
+          <span class="chip chip-green">Gradio</span>
+          <span class="chip chip-amber">HF Spaces</span>
+        </div>
+      </div>
+      <div class="depth-body">
+        <p>A Streamlit or FastAPI frontend would have required building microphone capture and audio playback from scratch.
+        Gradio ships both natively alongside session state management — the right scope for a conversational AI prototype.</p>
+        <p>HF Spaces provides a free persistent deployment with a shareable URL from day one, automatic restarts,
+        and no server provisioning.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
-    <p class="section-subtitle">
-      The application follows a layered conversational AI workflow where each component
-      handles a specific part of the coaching interaction pipeline.
+
+<div class="section">
+  <div class="wrap">
+    <div class="section-tag">Stack</div>
+    <h2>External services and replaceability</h2>
+    <p class="section-intro">All OpenAI services. Each has a documented replacement path at the same interface boundary.</p>
+
+    <table class="plain-table">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Role</th>
+          <th>Cost</th>
+          <th>Drop-in replacements</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>OpenAI Whisper</td>
+          <td>Multilingual speech-to-text</td>
+          <td>Per second of audio</td>
+          <td>faster-whisper (local), Groq Whisper</td>
+        </tr>
+        <tr>
+          <td>OpenAI GPT</td>
+          <td>Coaching intelligence + session memory</td>
+          <td>Per token</td>
+          <td>Claude, Gemini, LLaMA via Groq/Ollama</td>
+        </tr>
+        <tr>
+          <td>OpenAI TTS</td>
+          <td>Text-to-speech response delivery</td>
+          <td>Per character</td>
+          <td>ElevenLabs, Coqui, gTTS (free/lower quality)</td>
+        </tr>
+        <tr>
+          <td>Gradio</td>
+          <td>UI — mic, audio playback, session state</td>
+          <td>Open-source</td>
+          <td>Streamlit + custom audio components</td>
+        </tr>
+        <tr>
+          <td>HF Spaces</td>
+          <td>Hosting and deployment</td>
+          <td>Free CPU tier</td>
+          <td>Streamlit Cloud, Render, Railway, local</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<div class="section">
+  <div class="wrap">
+    <div class="section-tag">Adaptability</div>
+    <h2>Extend it for your use case</h2>
+    <p class="section-intro">
+      The pipeline is modular by design. The session architecture, transcript layer, and prompt scaffolding
+      are reusable as-is — only the content changes.
     </p>
 
-    <div class="cards">
-
-      <div class="card architecture-card">
-        <h3>👂 Speech Recognition Layer</h3>
-        <p><strong>OpenAI Whisper</strong></p>
-        <p>
-          Converts multilingual voice input into text for downstream conversational processing.
-        </p>
+    <div class="adapt-list">
+      <div class="adapt-item">
+        <div class="adapt-left">
+          <div class="adapt-verb">Revoice</div>
+          <div class="adapt-target">the persona</div>
+        </div>
+        <div class="adapt-right">
+          <h3>Change the coaching personality</h3>
+          <p>Adjust empathy, directness, warmth, question style, or switch frameworks — GROW, Co-Active, solution-focused.
+          The prompt file is the only thing that changes; the rest of the pipeline is untouched.</p>
+        </div>
       </div>
 
-      <div class="card architecture-card">
-        <h3>✍️ Transcript Validation Layer</h3>
-        <p><strong>Editable Transcript Interface</strong></p>
-        <p>
-          Allows users to validate or correct transcripts before generating the coaching response.
-        </p>
+      <div class="adapt-item">
+        <div class="adapt-left">
+          <div class="adapt-verb">Extend</div>
+          <div class="adapt-target">languages</div>
+        </div>
+        <div class="adapt-right">
+          <h3>Add more languages</h3>
+          <p>Whisper supports 90+ languages natively. Add a language selector to the UI, pass the
+          <code>language=</code> parameter to Whisper, and update the system prompt language instruction.
+          No model changes needed.</p>
+        </div>
       </div>
 
-      <div class="card architecture-card">
-        <h3>🧠 Conversational Intelligence Layer</h3>
-        <p><strong>OpenAI GPT</strong></p>
-        <p>
-          Handles conversational reasoning, coaching continuity, and reflective question generation.
-        </p>
+      <div class="adapt-item">
+        <div class="adapt-left">
+          <div class="adapt-verb">Swap</div>
+          <div class="adapt-target">the models</div>
+        </div>
+        <div class="adapt-right">
+          <h3>Replace any AI service</h3>
+          <p>GPT → Claude or LLaMA, Whisper → Groq or faster-whisper, TTS → ElevenLabs or Coqui.
+          Each layer has a single function boundary — replacing one doesn't touch the others.</p>
+        </div>
       </div>
 
-      <div class="card architecture-card">
-        <h3>🧭 Coaching Persona Layer</h3>
-        <p><strong>Prompt Engineering System</strong></p>
-        <p>
-          Defines coaching tone, empathy, directness, conversational warmth, and coaching behavior constraints.
-        </p>
+      <div class="adapt-item">
+        <div class="adapt-left">
+          <div class="adapt-verb">Repurpose</div>
+          <div class="adapt-target">the workflow</div>
+        </div>
+        <div class="adapt-right">
+          <h3>Different conversation, same architecture</h3>
+          <p>Interview prep coach, journaling companion, language learning tutor, leadership simulation.
+          The voice pipeline and session memory are format-agnostic — any reflective conversation structure fits.</p>
+        </div>
       </div>
 
-      <div class="card architecture-card">
-        <h3>🗣️ Voice Synthesis Layer</h3>
-        <p><strong>OpenAI TTS</strong></p>
-        <p>
-          Converts generated coaching responses into natural spoken audio replies.
-        </p>
+      <div class="adapt-item">
+        <div class="adapt-left">
+          <div class="adapt-verb">Add</div>
+          <div class="adapt-target">persistence</div>
+        </div>
+        <div class="adapt-right">
+          <h3>Extend with memory and personalisation</h3>
+          <p>The current architecture is session-scoped by design. Persistent memory, vector database retrieval,
+          session summaries, or personalised coaching profiles can be layered in without restructuring the core pipeline.</p>
+        </div>
       </div>
-
-      <div class="card architecture-card">
-        <h3>🖥️ Interaction Layer</h3>
-        <p><strong>Gradio Interface</strong></p>
-        <p>
-          Provides microphone input, audio playback, session state management,
-          and rapid conversational AI prototyping.
-        </p>
-      </div>
-
-      <div class="card architecture-card">
-        <h3>☁️ Deployment Layer</h3>
-        <p><strong>Hugging Face Spaces</strong></p>
-        <p>
-          Hosts the conversational AI prototype in a lightweight deployment environment.
-        </p>
-      </div>
-
-      <div class="card architecture-card">
-        <h3>🐍 Application Layer</h3>
-        <p><strong>Python</strong></p>
-        <p>
-          Acts as the orchestration layer connecting voice, prompting,
-          conversational logic, and AI services.
-        </p>
-      </div>
-
     </div>
 
-  </section>
-
-  <section>
-
-    <h2>Privacy & Confidentiality</h2>
-
-    <div class="cards">
-
-      <div class="card">
-        <h3>🔒 Transient Sessions</h3>
-        <p>
-          Coaching sessions are designed as temporary conversational interactions.
-        </p>
-      </div>
-
-      <div class="card">
-        <h3>🧹 No Intentional Storage</h3>
-        <p>
-          Conversations are not intentionally stored after the session ends.
-        </p>
-      </div>
-
-      <div class="card">
-        <h3>🔑 Protected API Keys</h3>
-        <p>
-          API credentials remain server-side protected and are never exposed to users.
-        </p>
-      </div>
-
-    </div>
-
-  </section>
-
-  <section>
-
-    <h2>Disclaimer</h2>
-
-    <p class="section-subtitle">
-      This prototype is intended as a reflective conversational coaching assistant
-      and not as a therapist, mental health professional, or medical advisory system.
-    </p>
-
-  </section>
-
-  <section>
-
-    <h2>Demo</h2>
-
-    <div class="video-box">
-
-      <p>
-        View the conversational coaching workflow, multilingual voice interaction,
-        editable transcript layer, and reflective prompting behavior.
-      </p>
-
-      <br>
-
-      <a class="btn" href="demo.mp4" target="_blank">Open Demo Video</a>
-
-    </div>
-
-  </section>
-
-  <section>
-
-    <h2>Fork This For Yourself</h2>
-
-    <p class="section-subtitle">
-      The architecture was intentionally designed to be modular and customizable
-      for different conversational AI workflows and interaction styles.
-    </p>
-
-    <div class="cards">
-
-      <div class="card">
-        <h3>👤 Customize the Coach Persona</h3>
-        <p>
-          Modify empathy level, coaching tone, directness, conversational warmth,
-          questioning style, and coaching frameworks.
-        </p>
-      </div>
-
-      <div class="card">
-        <h3>🌍 Add More Languages</h3>
-        <p>
-          Extend the multilingual prompting layer to support additional regional or global languages.
-        </p>
-      </div>
-
-      <div class="card">
-        <h3>🎯 Change the Use Case</h3>
-        <p>
-          Adapt the workflow for mentoring assistants, interview coaching,
-          journaling companions, leadership simulations, or learning tools.
-        </p>
-      </div>
-
-      <div class="card">
-        <h3>🧠 Add Memory & Personalization</h3>
-        <p>
-          Extend the system using persistent memory, vector databases,
-          session summaries, and personalized coaching profiles.
-        </p>
-      </div>
-
-      <div class="card">
-        <h3>🔓 Replace the AI Models</h3>
-        <p>
-          Swap OpenAI services with local/open-source models,
-          Ollama, Groq, Anthropic, Gemini, or other providers.
-        </p>
-      </div>
-
-      <div class="card">
-        <h3>☁️ Deploy Anywhere</h3>
-        <p>
-          Deploy the workflow using Hugging Face Spaces, Streamlit Cloud,
-          Render, AWS, Azure, or custom backend infrastructure.
-        </p>
-      </div>
-
-    </div>
-
-  </section>
-
-  <section>
-
-    <h2>Replication & Setup</h2>
-
-    <div class="video-box">
-
-<pre>
-git clone &lt;repository&gt;
+    <pre class="terminal"><span class="cmt"># clone and run locally</span>
+git clone &lt;repository-url&gt;
 pip install -r requirements.txt
+<span class="cmt"># add your API keys to .env</span>
 python app.py
-</pre>
+<span class="dim">
+# or push to Hugging Face Spaces for a shareable URL</span></pre>
+  </div>
+</div>
 
+
+<div class="section">
+  <div class="wrap">
+    <div class="section-tag">Privacy</div>
+    <h2>Designed for a sensitive context</h2>
+    <p class="section-intro">Coaching conversations are personal. The defaults reflect that.</p>
+
+    <div class="priv-grid">
+      <div class="priv-cell">
+        <h3>Session-scoped only</h3>
+        <p>Conversation history lives in memory for the duration of the session and is not written to disk or a database.</p>
+      </div>
+      <div class="priv-cell">
+        <h3>No logging by default</h3>
+        <p>Conversations are not stored after the session ends. Persistent storage would require an explicit architectural addition.</p>
+      </div>
+      <div class="priv-cell">
+        <h3>Credentials server-side</h3>
+        <p>All API keys are stored as HF Spaces secrets — never sent to the client or visible in browser network traffic.</p>
+      </div>
+      <div class="priv-cell">
+        <h3>Not a clinical tool</h3>
+        <p>This is a reflective conversational prototype, not a therapist or mental health service. Not designed for crisis support or clinical use.</p>
+      </div>
     </div>
+  </div>
+</div>
 
-  </section>
 
-  <footer>
-
-    Built as an exploration into multilingual conversational AI,
-    reflective coaching workflows, and AI-assisted prototyping.
-
-  </footer>
+<footer>
+  <div class="wrap footer-inner">
+    <p>Conversational AI Coach — voice · reflection · multilingual</p>
+    <p>Whisper · GPT · OpenAI TTS · Gradio · Hugging Face Spaces</p>
+  </div>
+</footer>
 
 </body>
 </html>
