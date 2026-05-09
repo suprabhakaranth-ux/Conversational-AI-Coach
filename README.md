@@ -1,3 +1,5 @@
+![Banner](./banner.png)
+
 # 🧘 AI Coaching Assistant (ICF-Style Conversational AI)
 
 An AI-powered reflective coaching assistant built using OpenAI APIs, multilingual prompting, voice interaction, and conversational memory.
