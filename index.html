@@ -558,8 +558,8 @@
         <div class="met-key">pipeline layers</div>
       </div>
       <div class="met">
-        <span class="met-val">₹0</span>
-        <div class="met-key">monthly running cost</div>
+        <span class="met-val">HF</span>
+        <div class="met-key">hosted on Spaces</div>
       </div>
     </div>
   </div>
@@ -588,7 +588,7 @@
   <div class="wrap">
     <div class="section-tag">How it works</div>
     <h2>End-to-end conversation flow</h2>
-    <p class="section-intro">Six stages, each stateless with respect to the next — any layer can be swapped independently.</p>
+    <p class="section-intro">Modular six-stage pipeline with separable components.</p>
 
     <div class="flow">
       <div class="flow-step">
@@ -597,7 +597,7 @@
         <div class="flow-body">
           <div class="flow-title">Speak</div>
           <div class="flow-tech">Microphone input via Gradio</div>
-          <div class="flow-desc">User speaks in English, Hindi, or Kannada. No language pre-selection needed — detection is handled downstream by Whisper.</div>
+          <div class="flow-desc">User speaks in English, Hindi, or Kannada. Whisper supports multilingual transcription while the coaching response language is selected by the user.</div>
         </div>
       </div>
 
@@ -637,7 +637,7 @@
         <div class="flow-body">
           <div class="flow-title">Synthesise voice</div>
           <div class="flow-tech">OpenAI TTS</div>
-          <div class="flow-desc">The coaching response is converted to spoken audio. Voice and pacing are matched to the coaching style configured in the persona prompt.</div>
+          <div class="flow-desc">The coaching response is converted to spoken audio using OpenAI TTS voice synthesis.</div>
         </div>
       </div>
 
@@ -699,7 +699,7 @@
         <span class="depth-title">ICF behavioural constraints in the system prompt</span>
         <div class="depth-chips">
           <span class="chip chip-green">Prompt engineering</span>
-          <span class="chip chip-amber">ICF / GROW / Co-active</span>
+          <span class="chip chip-amber">Inspired by ICF-style coaching principles</span>
         </div>
       </div>
       <div class="depth-body">
@@ -707,7 +707,7 @@
         ICF coaching principles — not soft stylistic instructions. Explicit constraints: ask one question per turn,
         never give unsolicited advice, acknowledge emotion before exploring action, reflect before probing deeper.</p>
         <div class="insight">
-          <div class="insight-label">Configurable axes</div>
+          <div class="insight-label">Prompt-adjustable coaching style</div>
           <p>Empathy level, directness, warmth, questioning style, and coaching framework are independently
           adjustable through the prompt — no code changes needed.</p>
         </div>
@@ -764,7 +764,7 @@
 <div class="section">
   <div class="wrap">
     <div class="section-tag">Stack</div>
-    <h2>External services and replaceability</h2>
+    <h2>External services and modularity</h2>
     <p class="section-intro">All OpenAI services. Each has a documented replacement path at the same interface boundary.</p>
 
     <table class="plain-table">
@@ -772,7 +772,6 @@
         <tr>
           <th>Service</th>
           <th>Role</th>
-          <th>Cost</th>
           <th>Drop-in replacements</th>
         </tr>
       </thead>
@@ -780,31 +779,26 @@
         <tr>
           <td>OpenAI Whisper</td>
           <td>Multilingual speech-to-text</td>
-          <td>Per second of audio</td>
           <td>faster-whisper (local), Groq Whisper</td>
         </tr>
         <tr>
           <td>OpenAI GPT</td>
           <td>Coaching intelligence + session memory</td>
-          <td>Per token</td>
           <td>Claude, Gemini, LLaMA via Groq/Ollama</td>
         </tr>
         <tr>
           <td>OpenAI TTS</td>
           <td>Text-to-speech response delivery</td>
-          <td>Per character</td>
           <td>ElevenLabs, Coqui, gTTS (free/lower quality)</td>
         </tr>
         <tr>
           <td>Gradio</td>
           <td>UI — mic, audio playback, session state</td>
-          <td>Open-source</td>
           <td>Streamlit + custom audio components</td>
         </tr>
         <tr>
           <td>HF Spaces</td>
           <td>Hosting and deployment</td>
-          <td>Free CPU tier</td>
           <td>Streamlit Cloud, Render, Railway, local</td>
         </tr>
       </tbody>
@@ -905,7 +899,7 @@ python app.py
     <div class="priv-grid">
       <div class="priv-cell">
         <h3>Session-scoped only</h3>
-        <p>Conversation history lives in memory for the duration of the session and is not written to disk or a database.</p>
+        <p>Conversation history lives in memory for the duration of the session and is not stored in a database..</p>
       </div>
       <div class="priv-cell">
         <h3>No logging by default</h3>
